@@ -13,6 +13,7 @@ It's built and tested on **Windows 10/11** and written to be cross-platform. The
 1. [What it can do](#what-it-can-do)
 2. [Requirements](#requirements)
 3. [Installation](#installation)
+   - [GitHub Codespaces / Linux](#github-codespaces--linux)
 4. [Configuration (`.env`)](#configuration-env)
 5. [Running the bot](#running-the-bot)
 6. [Testing](#testing)
@@ -114,6 +115,44 @@ TAVILY_API_KEY=tvly-...      # for web search and research
 ```
 
 You should see every test pass. If you've set `TAVILY_API_KEY`, one extra live search test also runs; otherwise it's skipped.
+
+### GitHub Codespaces / Linux
+
+A GitHub Codespace (the **Code → Codespaces** button on GitHub) is a **Linux** machine in the cloud with a `bash` terminal. The Windows commands above won't work there. In bash, `\` is an escape character, so `.venv\Scripts\python` turns into `.venvScriptspython: command not found`. Use forward slashes and `bin` instead of `Scripts`:
+
+```bash
+# 1. The audio library the bot imports (needed even just to run the tests)
+sudo apt-get update && sudo apt-get install -y libportaudio2
+
+# 2. Virtual environment and dependencies
+python -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+
+# 3. Run the tests (no keys, microphone, or internet needed)
+.venv/bin/python -m pytest -q
+```
+
+| Windows | Linux / Codespaces / macOS |
+|---|---|
+| `.venv\Scripts\python` | `.venv/bin/python` |
+| `copy .env.example .env` | `cp .env.example .env` |
+| `"{\"path\": \"~/Desktop\"}"` | `'{"path": "~/Desktop"}'` (single quotes, no backslashes) |
+
+**What works in Codespaces:**
+
+- Reading and editing the code, and running the test suite.
+- Trying tools without voice:
+  ```bash
+  .venv/bin/python tools_cli.py list
+  .venv/bin/python tools_cli.py list_dir '{"path": "~"}'
+  .venv/bin/python tools_cli.py create_document '{"format":"md","filename":"test","content":"# Hi"}'
+  ```
+- Web search and research, once you add keys: `cp .env.example .env`, then edit `.env`. Your `.env` is never on GitHub, so each new machine or Codespace needs its own.
+
+**What doesn't work in Codespaces:**
+
+- **Talking to the bot.** A cloud machine has no microphone or speakers, so `main.py` has nothing to listen to or play through. To use voice, clone the repo onto a real computer (Windows, macOS, or Linux desktop) and follow the steps above.
+- **Tools that act on a desktop.** `open_app`, `open_url`, and `look_at_screen` need a real screen. `run_shell` runs `bash` inside the Codespace, not on your laptop.
 
 ---
 
