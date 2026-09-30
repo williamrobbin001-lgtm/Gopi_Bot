@@ -1,0 +1,11 @@
+websockets>=13
+sounddevice
+numpy
+python-dotenv
+httpx
+trafilatura
+beautifulsoup4
+python-docx
+fpdf2
+pytest
+openpyxl
